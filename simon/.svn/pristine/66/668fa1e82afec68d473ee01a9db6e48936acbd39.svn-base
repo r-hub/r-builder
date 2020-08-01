@@ -1,0 +1,38 @@
+#!/bin/sh
+
+BASE=/Builds/R-builds/nightly
+export BASE
+
+: ${server=mac.urbanek.info}
+
+#GUIDMG=`sort $BASE/GUIs|uniq|sed 's/.*/&.dmg/'`
+#ssh $server '/usr/bin/rm -f wwwfiles/R??-branch*.dmg wwwfiles/R-*.dmg'
+FS=`ls $BASE/web/index.html $BASE/deploy/*/*/universal/R*.pkg $BASE/deploy/*/*/universal/R*-universal.tar.gz $BASE/web/log-* $BASE/deploy/*/*/universal/R*.dmg`
+for fn in $FS; do
+    ok=`find "$fn" -mtime -1`
+    if [ -n "$ok" ]; then
+	scp "$fn" $server:wwwfiles/
+    fi
+done
+
+#### sync with pome on mavericks builds
+#rsync --delete-after -av pome:/Builds/nightly/deploy/mavericks/ $BASE/deploy/mavericks/
+
+## hack since mavericks failed to sign                                                                                  
+
+for OSTYPE in ; do #mavericks el-capitan; do                                  
+    PKGS=`ls $BASE/deploy/$OSTYPE/*/*$OSTYPE.pkg`
+    $BASE/unlock-sign
+    for pkg in $PKGS; do
+	spkg=`echo $pkg | sed "s:$OSTYPE.pkg:$OSTYPE-signed.pkg:"`
+	if [ ! -e "$spkg" ]; then
+            xcrun productsign --sign 'Developer ID Installer' $pkg $spkg
+	fi
+    done
+done
+
+rsync -av --delete-after $BASE/deploy/el-capitan/ $server:wwwfiles/el-capitan/
+rsync -av --delete-after $BASE/deploy/high-sierra/ $server:wwwfiles/high-sierra/
+ssh $server 'wwwfiles/rmold'
+
+# scp web/index.html r:wwwfiles/

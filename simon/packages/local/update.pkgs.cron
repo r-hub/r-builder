@@ -1,0 +1,144 @@
+#!/bin/sh
+# optional (disabled by default):
+# BUILD_DEVEL=yes
+# PARALLEL=yes
+
+: ${BASE=/Builds/packages}
+
+SYNCF="${BASE}/nightly.sync"
+
+# common doesn't have to check R
+SKIP_R_CHK=yes
+# get oscode
+. ${BASE}/common
+
+cd "${BASE}"
+if [ -e lock.nightly.update ]; then
+    LPID=`cat $BASE/lock.nightly.update`
+    if ps -p $LPID|grep update; then
+        echo "Nightly update is locked by another build, pid $LPID." &1>2
+        exit 1
+    else
+        echo "Stale lock for pid $LPID, removing"
+        rm -f $BASE/lock.nightly.update
+    fi
+fi
+echo "$$" > lock.nightly.update
+
+: ${ismaster=no}
+host=`hostname -s|tr A-Z a-z`
+if [ "$host" = "hagal" ]; then
+    # Hagal is the master machine now
+    ismaster=yes
+fi
+PATH=$PATH:/usr/local/bin
+if [ -e /usr/texbin ]; then
+    PATH=$PATH:/usr/texbin
+fi
+export ismaster
+export PATH
+export BASE
+
+echo " Base path: ${BASE}"
+echo " Build machine: $host"
+echo " it this the master: $ismaster"
+
+echo ''
+echo " - updating package sources ..."
+$BASE/sync.bioc.in
+
+# move current framework aside (if existent)
+if [ -e /Library/Frameworks/R.framework ]; then
+    if [ -e /Library/Frameworks/R.framework.sav ]; then
+	rm -rf /Library/Frameworks/R.framework.sav
+    fi
+    mv /Library/Frameworks/R.framework /Library/Frameworks/R.framework.sav
+fi
+
+: ${versions=`cat $BASE/vers`}
+
+for RVERSI in $versions; do
+  RFWBIN=`echo "${RVERSI}" | sed -e 's/.*://'`
+  ASKVER=`echo "${RVERSI}" | sed -e 's/:.*//'`
+
+  echo "Restoring R ${ASKVER}.x from ${RFWBIN} ..."
+  # restore R release for the builds
+  rm -rf /Library/Frameworks/R.framework
+  tar fxz "${RFWBIN}" -C /
+
+  echo "Disabling vecLib"
+  ln -sfn libRblas.0.dylib /Library/Frameworks/R.framework/Resources/lib/libRblas.dylib
+
+  ver=`R --version|sed -n 's/R version \([0-9]\{1,\}\.[0-9]\{1,\}\).*/\1/p'`
+  if [ -z "$ver" ]; then
+      ## try to use the headers instead
+      ver=`echo '#include <Rversion.h>~R_MAJOR.R_MINOR' | tr '~' '\n' | gcc -E - -I /Library/Frameworks/R.framework/Headers | grep '^"' | sed 's:"::g' | sed 's:\.[0-9]\{1,\}$::'`
+  fi
+  echo "R reports version ${ver}"
+  if [ "${ver}" != "${ASKVER}" ]; then
+      echo "*** ERROR version mismatch! (need '${ASKVER}', have '${ver}')"
+      R --version > "$BASE/ERROR_MISMATCH_${ASKVER}"
+  else
+      echo "*** R version for the package builds: ***"
+      R --version|grep ^R
+      echo ""
+
+      ./cran.preflight
+
+      ./rm-orphans "$BASE/$oscode-x86_64/bin/${ver}" "$BASE/CRAN/src/contrib"
+
+      ./register-pkgs
+      ./validate-pkgs
+
+      cd "${BASE}"
+      make cache
+
+      if [ -z "${SKIP_UPDATE}" ]; then
+	  cd "${BASE}"
+	  # SKIPDONE=1 # not ...
+	  UPDATE=1 ./mk.chk
+      fi
+
+      if [ -n "${DO_BIOC}" ]; then
+	  cd "${BASE}"
+	  make -C BIOC.new cache
+	  CHECK=1 ./run.bioc
+      fi
+
+      ## run rforge builds if present
+      if [ -e "/Builds/rforge/run.queue" ]; then
+	  ## make sure BASE is set explicitly as it overrides rforge's BASE
+	  BASE=/Builds/rforge sh /Builds/rforge/run.queue
+	  BASE=/Builds/rforge sh /Builds/rforge/sync-win > /dev/null
+      fi
+
+      ## update BioC -- we should really do that before, but in case it fails we do it after
+      "${BASE}/${oscode}-universal/extralib/up"
+  fi
+done
+
+cd "${BASE}"
+./rm-orphans
+./up.repos
+
+#    "${BASE}/register-pkgs" "${BASE}/${oscode}-universal/bin/${ver}" bin .tgz
+
+cd "${BASE}"
+./rm-orphan-results
+./sync-rcheck
+#/Builds/packages/local/bin-out
+
+if [ -e "${BASE}/summary/run" ]; then
+    cd "${BASE}/summary"
+    ./run
+fi
+
+cd "${BASE}"
+# restore current R release for the builds
+rm -rf /Library/Frameworks/R.framework
+tar fxz R-current.tar.gz -C /
+
+#--- cleanup
+rm -f ${BASE}/lock.nightly.update
+
+${BASE}/cleantmp >/dev/null 2>/dev/null

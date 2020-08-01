@@ -1,0 +1,16 @@
+#!/bin/sh
+
+if [ -z "$1" ]; then
+    echo ''
+    echo " Usage: $0 <directory>"
+    echo ''
+    exit 1
+fi
+
+RDIRS=$1
+# this is really no longer used - it had changed the GUI builds but there is no difference anymore
+RRELEASE=1
+export RDIRS
+export RRELEASE
+./sa-nightly
+
