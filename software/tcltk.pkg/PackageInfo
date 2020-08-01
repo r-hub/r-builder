@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<pkg-info overwrite-permissions="true" relocatable="false" identifier="org.r-project.x86_64.tcltk" postinstall-action="none" version="8.6.6" format-version="2" generator-version="InstallCmds-720 (19E266)" install-location="/" auth="root">
+    <payload numberOfFiles="1743" installKBytes="32224"/>
+    <bundle-version/>
+    <upgrade-bundle/>
+    <update-bundle/>
+    <atomic-update-bundle/>
+    <strict-identifier/>
+    <relocate/>
+</pkg-info>
