@@ -43,9 +43,45 @@ function install_basictex() {
      )
 }
 
+function install_gfortran() {
+    echo "== INSTALLING gfortran ============================="
+    (
+        set -e
+        curl -L -O \
+            https://github.com/fxcoudert/gfortran-for-macOS/releases/download/8.2/gfortran-8.2-Mojave.dmg
+        sudo hdiutil attach gfortran-8.2-Mojave.dmg
+        sudo installer -package \
+            /Volumes/gfortran-8.2-Mojave/gfortran-8.2-Mojave/gfortran.pkg \
+            -target /
+        sudo hdiutil detach /Volumes/gfortran-8.2-Mojave
+    )
+}
+
+function install_libs() {
+    echo "== INSTALLING libraries ============================"
+    (
+        set -e
+        curl -L -O https://mac.r-project.org/libs-4/xz-5.2.4-darwin.17-x86_64.tar.gz
+        sudo tar fvxz xz-5.2.4-darwin.17-x86_64.tar.gz -C / || true
+        curl -L -O https://mac.r-project.org/libs-4/pcre2-10.34-darwin.17-x86_64.tar.gz
+        sudo tar fvxz pcre2-10.34-darwin.17-x86_64.tar.gz -C / || true
+    )
+}
+
+function install_texinfo() {
+    echo "== INSTALLING texinfo from brew ===================="
+    (
+        set -e
+        sudo installer -package software/texinfo.pkg -target /
+    )
+}
+
 function main() {
     install_xquartz
     install_basictex
+    install_gfortran
+    install_libs
+    install_texinfo
 }
 
 if [ "$sourced" = "0" ]; then
