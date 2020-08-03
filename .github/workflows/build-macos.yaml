@@ -18,6 +18,14 @@ jobs:
       with:
         fetch-depth: 10
 
+    - name: Cleanup MacOS system
+      if: runner.os == 'macos'
+      run: |
+        brew uninstall --force --ignore-dependencies $(brew list) 2>&1 | sed 's/Warning/Note/g'
+        curl -fsSOL https://raw.githubusercontent.com/Homebrew/install/master/uninstall.sh
+        bash uninstall.sh --force --quiet 2>&1 | sed 's/Warning/Note/g'
+        hash -r && rm uninstall.sh
+
     - name: Build
       run: |
         ./build.sh
