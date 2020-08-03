@@ -69,11 +69,24 @@ function install_libs() {
 }
 
 function install_texinfo() {
-    echo "== INSTALLING texinfo from brew ===================="
+    echo "== INSTALLING texinfo =============================="
     (
         set -e
         sudo installer -package software/texinfo.pkg -target /
     )
+}
+
+function uninstall_brew() {
+    if /usr/bin/which -s brew; then
+        brew cask install xquartz 2>&1 | sed 's/^Warning/Note/g'
+        brew uninstall --force --ignore-dependencies \
+             $(brew list) 2>&1 | sed 's/Warning/Note/g'
+        curl -fsSOL \
+             https://raw.githubusercontent.com/Homebrew/install/master/uninstall.sh
+        bash uninstall.sh --force --quiet 2>&1 | \
+            sed 's/Warning/Note/g'
+        hash -r && rm uninstall.sh
+    fi
 }
 
 function main() {
@@ -82,6 +95,7 @@ function main() {
     install_gfortran
     install_libs
     install_texinfo
+    uninstall_brew
 }
 
 if [ "$sourced" = "0" ]; then
