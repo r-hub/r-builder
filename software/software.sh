@@ -78,7 +78,6 @@ function install_texinfo() {
 
 function uninstall_brew() {
     if /usr/bin/which -s brew; then
-        brew cask install xquartz 2>&1 | sed 's/^Warning/Note/g'
         brew uninstall --force --ignore-dependencies \
              $(brew list) 2>&1 | sed 's/Warning/Note/g'
         curl -fsSOL \
