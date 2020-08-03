@@ -1,4 +1,6 @@
-on: push
+on:
+  schedule:
+    - cron:  '55 5 * * *'
 
 name: Build macOS installer daily
 
@@ -22,7 +24,7 @@ jobs:
         cat _build/R4/high-sierra-x86_64/R-devel/config.log || true
         echo "::endgroup::"
         echo "::group::Build log"
-        cat _build/R4/high-sierra-x86_64/R-devel.build
+        cat _build/R4/high-sierra-x86_64/R-devel.build || true
         echo "::endgroup::"
 
     - name: Upload build tar.gz
