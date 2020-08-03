@@ -1,0 +1,18 @@
+on: push
+
+name: Build macOS installer daily
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 10
+
+    - name: Build
+      run: |
+        ./build.sh
+
