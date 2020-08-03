@@ -78,11 +78,11 @@ function install_texinfo() {
 
 function uninstall_brew() {
     if /usr/bin/which -s brew; then
-        brew uninstall --force --ignore-dependencies \
+        sudo brew uninstall --force --ignore-dependencies \
              $(brew list) 2>&1 | sed 's/Warning/Note/g'
         curl -fsSOL \
              https://raw.githubusercontent.com/Homebrew/install/master/uninstall.sh
-        bash uninstall.sh --force --quiet 2>&1 | \
+        sudo bash uninstall.sh --force --quiet 2>&1 | \
             sed 's/Warning/Note/g'
         hash -r && rm uninstall.sh
     fi
