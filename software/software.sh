@@ -76,12 +76,21 @@ function install_texinfo() {
     )
 }
 
+function install_svn() {
+    (
+        set -e
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+        brew install svn
+    )
+}
+
 function main() {
     install_xquartz
     install_basictex
     install_gfortran
     install_libs
     install_texinfo
+    install_svn
 }
 
 if [ "$sourced" = "0" ]; then
