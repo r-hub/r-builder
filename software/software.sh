@@ -80,7 +80,7 @@ function install_svn() {
     (
         cd /tmp
 	sudo rm -rf subversion-*
-	wget https://mac.r-project.org/tools/subversion-1.14.0-darwin15.6.tar.gz
+	curl -OL https://mac.r-project.org/tools/subversion-1.14.0-darwin15.6.tar.gz
 	tar xzf subversion-1.14.0-darwin15.6.tar.gz
 	sudo rm /usr/local/bin/svn
 	sudo cp subversion-1.14.0-darwin15.6/svn /usr/local/bin/
