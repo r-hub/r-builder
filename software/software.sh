@@ -87,6 +87,7 @@ function install_svn() {
     )
     (   
         ./software/svn.sh || true
+	sudo ./software/svn.sh || true
     )
 }
 
