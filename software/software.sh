@@ -78,9 +78,12 @@ function install_texinfo() {
 
 function install_svn() {
     (
-        set -e
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
-        brew install svn
+        cd /tmp
+	sudo rm -rf subversion-*
+	wget https://mac.r-project.org/tools/subversion-1.14.0-darwin15.6.tar.gz
+	tar xzf subversion-1.14.0-darwin15.6.tar.gz
+	sudo rm /usr/local/bin/svn
+	sudo cp subversion-1.14.0-darwin15.6/svn /usr/local/bin/
     )
 }
 
