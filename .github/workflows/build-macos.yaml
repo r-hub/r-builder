@@ -35,6 +35,9 @@ jobs:
     - name: Logs
       if: ${{ always() }}
       run: |
+        echo "::group::nightly.log"
+        cat _build/R4/nightly.log
+        echo "::endgroup::"
         echo "::group::config.log"
         cat _build/R4/high-sierra-x86_64/R-devel/config.log || true
         echo "::endgroup::"
