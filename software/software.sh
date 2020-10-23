@@ -86,7 +86,7 @@ function install_svn() {
 	sudo cp subversion-1.14.0-darwin15.6/svn /usr/local/bin/
     )
     (   
-        ./software/svn.sh
+        ./software/svn.sh || true
     )
 }
 
