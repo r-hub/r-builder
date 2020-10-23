@@ -82,7 +82,7 @@ function install_svn() {
 	sudo rm -rf subversion-*
 	curl -OL https://mac.r-project.org/tools/subversion-1.14.0-darwin15.6.tar.gz
 	tar xzf subversion-1.14.0-darwin15.6.tar.gz
-	sudo rm /usr/local/bin/svn
+	sudo rm -f /usr/local/bin/svn
 	sudo cp subversion-1.14.0-darwin15.6/svn /usr/local/bin/
     )
 }
