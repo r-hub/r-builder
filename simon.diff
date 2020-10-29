@@ -100,3 +100,26 @@ Index: R4/packaging/build.sh
  echo " - Building final bundle ..."
 -productbuild --timestamp --resources "$PKGROOT/res" --sign 'Developer ID Installer' --distribution "$PKGROOT/dist.plist" --package-path "$PKGROOT" "$PKGROOT/$NAME.pkg" && cp -p "$PKGROOT/$NAME.pkg" "$BASE/deploy/$osname/$NAME/" && echo "R $VERFULL, GUI $GUIVER in $NAME.pkg" > "$BASE/deploy/$osname/$NAME/$NAME.pkg.SUCCESS" && echo "SUCCESS, a copy is in $BASE/deploy/$osname/$NAME/$NAME.pkg"
 +productbuild --timestamp --resources "$PKGROOT/res" --distribution "$PKGROOT/dist.plist" --package-path "$PKGROOT" "$PKGROOT/$NAME.pkg" && cp -p "$PKGROOT/$NAME.pkg" "$BASE/deploy/$osname/$NAME/" && echo "R $VERFULL, GUI $GUIVER in $NAME.pkg" > "$BASE/deploy/$osname/$NAME/$NAME.pkg.SUCCESS" && echo "SUCCESS, a copy is in $BASE/deploy/$osname/$NAME/$NAME.pkg"
+
+Index: R4/src/consh.c
+===================================================================
+--- R4/src/consh.c	(revision 4304)
++++ R4/src/consh.c	(working copy)
+@@ -4,6 +4,7 @@
+ #include <unistd.h>
+ #include <stdio.h>
+ #include <string.h>
++#include <stdlib.h>
+ 
+ FILE *lf;
+ 
+Index: R4/src/fixup.c
+===================================================================
+--- R4/src/fixup.c	(revision 4304)
++++ R4/src/fixup.c	(working copy)
+@@ -1,4 +1,5 @@
+ #include <unistd.h>
++#include <stdlib.h>
+ 
+ int main(int argc, char **argv) {
+   setuid(0);
