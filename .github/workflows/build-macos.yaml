@@ -19,7 +19,7 @@ jobs:
     - name: Cleanup MacOS system
       if: runner.os == 'macos'
       run: |
-        brew uninstall openssl@1.0.2t
+        brew uninstall openssl@1.1
         brew uninstall python@2.7.17
         brew untap local/openssl
         brew untap local/python2
