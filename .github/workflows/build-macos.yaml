@@ -19,9 +19,6 @@ jobs:
     - name: Cleanup MacOS system
       if: runner.os == 'macos'
       run: |
-        brew uninstall python@2.7.17
-        brew untap local/openssl
-        brew untap local/python2
         brew uninstall --force --ignore-dependencies $(brew list) 2>&1 | sed 's/Warning/Note/g'
         curl -fsSOL https://raw.githubusercontent.com/Homebrew/install/master/uninstall.sh
         bash uninstall.sh --force --quiet 2>&1 | sed 's/Warning/Note/g'
