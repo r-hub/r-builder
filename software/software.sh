@@ -35,7 +35,7 @@ function install_basictex() {
     (
         set -e
         curl -L -O \
-            http://mirror.ox.ac.uk/sites/ctan.org/systems/mac/mactex/BasicTeX.pkg
+	    http://mirror.ctan.org/systems/mac/mactex/BasicTeX.pkg
         sudo installer -package BasicTeX.pkg -target /
 	export PATH=/usr/local/texlive/2020basic/bin/x86_64-darwin/:$PATH
         sudo tlmgr update --self
