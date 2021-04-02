@@ -38,7 +38,7 @@ function install_basictex() {
 	    http://mirror.ctan.org/systems/mac/mactex/BasicTeX.pkg
         sudo installer -package BasicTeX.pkg -target /
 	export PATH=/usr/local/texlive/2020basic/bin/x86_64-darwin/:$PATH
-        sudo tlmgr update --self
+        sudo tlmgr update --self || true
         sudo tlmgr install cm-super helvetic inconsolata texinfo
      )
 }
