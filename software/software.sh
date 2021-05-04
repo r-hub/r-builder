@@ -22,7 +22,7 @@ function install_xquartz() {
         fi
         local version=2.7.11
         curl -C - -L -O -f \
-            https://dl.bintray.com/xquartz/downloads/XQuartz-${version}.dmg
+            https://github.com/XQuartz/XQuartz/releases/download/XQuartz-${version}/XQuartz-${version}.dmg
         sudo hdiutil attach XQuartz-${version}.dmg
         sudo installer -package /Volumes/XQuartz-${version}/XQuartz.pkg \
             -target /
