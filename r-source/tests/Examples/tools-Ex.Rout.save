@@ -1,7 +1,7 @@
 
-R Under development (unstable) (2021-04-16 r80178) -- "Unsuffered Consequences"
+R Under development (unstable) (2021-05-17 r80305) -- "Unsuffered Consequences"
 Copyright (C) 2021 The R Foundation for Statistical Computing
-Platform: x86_64-pc-linux-gnu (64-bit)
+Platform: x86_64-apple-darwin20.4.0 (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -56,8 +56,9 @@ Type 'q()' to quit R.
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head><title>R: This is a sample header</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
 <link rel="stylesheet" type="text/css" href="/doc/html/R.css" />
-</head><body>
+</head><body><div class="container">
 <h1> This is a sample header
 <img class="toplogo" src="/doc/html/Rlogo.svg" alt="[R logo]" />
 </h1>
@@ -203,7 +204,7 @@ Error in assertWarning(ff()) :
 > bibstyle("unsorted", sortKeys = function(refs) seq_along(refs),
 +     fmtPrefix = function(paper) paste0("[", paper$.index, "]"),
 +        .init = TRUE)
-<environment: 0x20727c0>
+<environment: 0x7fc221157a98>
 > print(refs, .bibstyle = "unsorted")
 [1] R Core Team (2013). _R: A Language and Environment for Statistical
 Computing_. R Foundation for Statistical Computing, Vienna, Austria.
@@ -844,8 +845,9 @@ function (x, ...)
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head><title>R: R</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
 <link rel="stylesheet" type="text/css" href="/doc/html/R.css" />
-</head><body>
+</head><body><div class="container">
 <h1> R
 <img class="toplogo" src="/doc/html/Rlogo.svg" alt="[R logo]" />
 </h1>
@@ -894,7 +896,7 @@ An illustration of lexical scoping.
 </table>
 <p>
 </p>
-</body></html>
+</div></body></html>
 > 
 > 
 > 
@@ -952,7 +954,7 @@ An illustration of lexical scoping.
 > 
 > ## IGNORE_RDIFF_BEGIN
 > R_user_dir("FOO", "cache")
-[1] "/data/gannet/ripley/.cache/R/FOO"
+[1] "/Users/ripley/Library/Caches/org.R-project.R/R/FOO"
 > ## IGNORE_RDIFF_END
 > 
 > 
@@ -995,6 +997,17 @@ List of 6
 > ### Keywords: utilities
 > 
 > ### ** Examples
+> 
+>   gridEx <- system.file("doc", "grid.Rnw", package = "grid")
+>   vi <- vignetteInfo(gridEx)
+>   str(vi)
+List of 5
+ $ file    : chr "grid.Rnw"
+ $ title   : chr "Introduction to grid"
+ $ depends : chr(0) 
+ $ keywords: chr(0) 
+ $ engine  : chr "utils::Sweave"
+> 
 > 
 > 
 > cleanEx()
@@ -1040,7 +1053,7 @@ List of 6
 > cleanEx()
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  0.315 0.016 0.332 0 0 
+Time elapsed:  0.32 0.039 0.375 0 0 
 > grDevices::dev.off()
 null device 
           1 

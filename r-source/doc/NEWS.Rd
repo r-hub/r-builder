@@ -17,7 +17,74 @@
       of \R to that provided by \samp{libcurl}.
     }
   }
+
+  \subsection{NEW FEATURES}{
+    \itemize{
+      \item \code{matrix(x, n,m)} now warns in more cases where
+      \code{length(x)} is larger than \code{n * m}; suggested by Abby
+      Spurdle and Wolfgang Huber in Feb 2021 on the R-devel mailing
+      list.
+
+      \item Function \code{file_test()} in package \pkg{utils} gains
+      tests for symlinks, reability and writability.
+    }
+  }
+
+  \subsection{C-LEVEL FACILITIES}{
+    \itemize{
+      \item The non-API header \file{R_ext/R-ftp-http.h} is no longer
+      provided.  The entry points it included are either deprecated or
+      defunct.
+    }
+  }
+
+  \subsection{DEPRECATED AND DEFUNCT}{
+    \itemize{
+      \item The (non-default) \code{method = "internal"} for
+      \code{download.file} and \code{url} no longer supports \samp{ftp://}
+      URIs. 
+    }
+  }
+
+  \subsection{BUG FIXES}{
+    \itemize{
+      \item \code{qnbinom(p, size, mu)} for large \code{size/mu} is
+      corrected for a range of cases (\PR{18095}); similarly for the
+      \code{(size, prob)} parametrization of the negative binomial.
+
+      \code{qpois()} and \code{qbinom()} are better and/or faster for
+      extreme cases.
+
+      The underlying C code has been modularized and is common to all
+      four cases of discrete distributions.
+    }
+  }
 }
+
+\section{\Rlogo CHANGES IN R 4.1.0 patched}{
+  \subsection{NEW FEATURES}{
+    \itemize{
+      \item \code{require(\var{pkg}, quietly = TRUE)} is quieter and in
+      particular does not warn if the package is not found.
+    }
+  }
+
+  \subsection{DEPRECATED AND DEFUNCT}{
+    \itemize{
+      \item Using the non-default \code{method = "internal"} for
+      \samp{ftp://} URIs is deprecated for \code{download.file} and
+      \code{url}.
+    }
+  }
+
+  \subsection{BUG FIXES}{
+    \itemize{
+      \item \command{make check-devel} works again in an \R build
+      configured with \option{--without-recommended-packages}.
+    }
+  }
+}
+
 
 \section{\Rlogo CHANGES IN R 4.1.0}{
   \subsection{FUTURE DIRECTIONS}{
@@ -93,7 +160,7 @@
       and also \code{checkDocFiles()} have a new option \code{chkInternal}
       allowing to check Rd files marked with keyword \code{"internal"} as
       well.  The latter can be activated for \command{R CMD check} via
-      experimental environment variable \env{_R_CHECK_RD_INTERNAL_TOO_}.
+      environment variable \env{_R_CHECK_RD_INTERNAL_TOO_}.
 
       \item New functions \code{numToBits()} and \code{numToInts()}
       extend the \code{raw} conversion utilities to (double precision)
@@ -176,15 +243,13 @@
       by Antoine Fabri on R-devel.)
 
       \item \R{} now provides a shorthand notation for creating functions,
-      e.g. \code{\(x) x + 1} is parsed as \code{function(x) x + 1}.  This
-      feature is experimental and may change prior to release.
+      e.g. \code{\(x) x + 1} is parsed as \code{function(x) x + 1}.
 
       \item \R{} now provides a simple native forward pipe syntax
       \code{|>}.  The simple form of the forward pipe inserts the
       left-hand side as the first argument in the right-hand side call.
       The pipe implementation as a syntax transformation was motivated
-      by suggestions from Jim Hester and Lionel Henry.  This feature is
-      experimental and may change prior to release.
+      by suggestions from Jim Hester and Lionel Henry.
 
       \item \code{all.equal(f, g)} for \code{function}s now by default also
       compares their \code{environment(.)}s, notably via new
@@ -713,9 +778,6 @@
 
       \item Binary mode in \code{fifo} on Windows is now properly detected
       from argument \code{open} (\PR{15600}, \PR{18031}).
-
-      \item \code{qnbinom(p, size, mu)} for large \code{size/mu} now warns
-      when it loses accuracy.  We plan to improve it instead (\PR{18095}).
     }
   }
 }
