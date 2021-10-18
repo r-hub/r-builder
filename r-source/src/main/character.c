@@ -71,7 +71,7 @@ abbreviate chartr make.names strtrim tolower toupper give error.
 # include <config.h>
 #endif
 
-/* Used to indicate that we can safely converted marked UTF-8 strings
+/* Used to indicate that we can safely convert marked UTF-8 strings
    to wchar_t* -- not currently used.
 */
 #if defined(Win32) || defined(__STDC_ISO_10646__) || defined(__APPLE__) || defined(__FreeBSD__) || defined(__sun)
@@ -275,7 +275,7 @@ int R_nchar(SEXP string, nchar_type type_,
 		if (msg_name)
 		    R_FreeStringBufferL(&cbuff);
 		vmaxset(vmax);
-		return (nci18n < 1) ? nc : nci18n;
+		return (nci18n < 0) ? nc : nci18n;
 	    } else if (!allowNA) {
 		if (msg_name)
 		    error(_("invalid multibyte string, %s"), msg_name);
@@ -706,6 +706,8 @@ SEXP attribute_hidden do_substrgets(SEXP call, SEXP op, SEXP args, SEXP env)
 	}
 	R_FreeStringBufferL(&cbuff);
     }
+    SHALLOW_DUPLICATE_ATTRIB(s, x);
+    /* This copied the class, if any */
     UNPROTECT(1);
     return s;
 }

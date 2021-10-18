@@ -100,9 +100,13 @@
       \dQuote{max-or-0-if-any} recycling rule, such that, e.g.,
       \code{Map(`+`, 1:3, 1[0])} is valid now.
 
-      \item \code{as.character(<obj>)} for \code{"hexmode"} or \code{"octmode"}
-      objects now fulfills the important basic rule
+      \item \code{as.character(<obj>)} for \code{"hexmode"} or
+      \code{"octmode"} objects now fulfils the important basic rule
       \code{as.character(x)[j] === as.character(x[j])}.
+
+      \item \code{substr(ch, start,end) <- new} now e.g., preserves
+      \code{names(ch)}; ditto for \code{substring()}, thanks to a patch
+      from Brodie Gaslam.
     }
   }
 
@@ -152,6 +156,14 @@
       \item \env{_R_CHECK_DEPENDS_ONLY_} can be applied selectively to
       examples, tests and/or vignettes in \command{R CMD check}: see the
       \dQuote{R Internals} manual.
+
+      \item \env{_R_CHECK_SRC_MINUS_W_IMPLICIT_} now defaults to true:
+      recent versions of Apple \command{clang} on macOS have made
+      implicit function declarations in C into a compilation error.
+
+      \item \command{R CMD check --as-cran} makes use of the
+      environment variable \env{AUTORECONF}.  See the
+      \dQuote{R Internals} manual §8 for further details.
     }
   }
 
@@ -176,15 +188,14 @@
       \code{MESSAGE}, \code{ERROR}, \code{WARN}, \code{WARNING},
       \code{RECOVER}, \dots{} are no longer defined by default in
       \file{R_exts/RS.h} (included by \file{R.h}).  Replace these by
-      calls to \code{Rf_error} and \code{Rf_warning}.
+      calls to \code{Rf_error} and \code{Rf_warning} (defined in header
+      \file{R_ext/Error.h} included by \file{R.h}).
 
       For the time being the definitions can be reinstated by defining
       macro \code{R_LEGACY_S_DEFS} to \code{1} \emph{before} including
       any \R{} header.  Header \file{R_ext/RS.h} will no longer include
-      \file{R_ext/Error.h} unless \code{R_LEGACY_S_DEFS} is set.
-
-      [Early warning: removal planned for Oct 8.]
-    }
+      \file{R_ext/Error.h} unless \code{R_LEGACY_S_DEFS} is set to \code{1}.
+   }
   }
 
   \subsection{DEPRECATED AND DEFUNCT}{
@@ -251,12 +262,23 @@
       \PR{17501}.
 
       \item Determining correct translation domain in non-base packages,
-      addressing the combo of \PR{18092} and \PR{17998} (\code{#c6}) with reports and
-      \emph{augmented} patch #2904 by Suharto Anggono.
+      addressing the combo of \PR{18092} and \PR{17998} (\code{#c6})
+      with reports and \emph{augmented} patch #2904 by Suharto Anggono.
+
+      Note that \code{"R-base"} is no longer default domain e.g., for
+      top-level calls to \code{gettext()}; rather translation needs
+      explicit \code{domain = *} specification in such cases.
 
       \item \code{identical(attrib.as.set=FALSE)} now works correctly with
       data frames with default row names (Thanks to Charlie Gao's
       \PR{18179}).
+
+      \item \code{txtProgresBar()} now enforces a non-zero width for
+      \code{char}, without which no progress can be visible.
+
+      \item \code{dimnames(table(d))} is more consistent in the case where
+      \code{d} is a list with a single component, thanks to Thomas Soeiro's
+      report to R-devel.
     }
   }
 }
@@ -368,7 +390,7 @@
       \samp{ftp://}.)
 
       For \samp{ftp://} URIs the default method is now \code{"libcurl"}
-      if available (which it is on \acronym{CRAN builds}).
+      if available (which it is on \acronym{CRAN} builds).
 
       \code{method = "wininet"} remains the default for \samp{http://}
       and \samp{https://} URIs but if \code{libcurl} is available, using

@@ -1049,7 +1049,7 @@ SEXP findVarInFrame3(SEXP rho, SEXP symbol, Rboolean doGet)
 
 /* This variant of findVarinFrame3 is needed to avoid running active
    binding functions in calls to exists() with mode = "any" */
-static Rboolean existsVarInFrame(SEXP rho, SEXP symbol)
+Rboolean R_existsVarInFrame(SEXP rho, SEXP symbol)
 {
     int hashcode;
     SEXP frame, c;
@@ -1342,7 +1342,7 @@ findVar1mode(SEXP symbol, SEXP rho, SEXPTYPE mode, int inherits,
 	mode = CLOSXP;
     while (rho != R_EmptyEnv) {
 	if (! doGet && mode == ANYSXP)
-	    vl = existsVarInFrame(rho, symbol) ? R_NilValue : R_UnboundValue;
+	    vl = R_existsVarInFrame(rho, symbol) ? R_NilValue : R_UnboundValue;
 	else
 	    vl = findVarInFrame3(rho, symbol, doGet);
 
@@ -4118,7 +4118,7 @@ static void R_StringHash_resize(unsigned int newsize)
 	    if (ISNULL(new_chain))
 		SET_HASHPRI(new_table, HASHPRI(new_table) + 1);
 	    /* move the current chain link to the new chain */
-	    /* this is a destrictive modification */
+	    /* this is a destructive modification */
 	    new_chain = SET_CXTAIL(val, new_chain);
 	    SET_VECTOR_ELT(new_table, new_hashcode, new_chain);
 	    chain = next;
@@ -4229,7 +4229,7 @@ SEXP mkCharLenCE(const char *name, int len, cetype_t enc)
 	chain = VECTOR_ELT(R_StringHash, hashcode);
 	if (ISNULL(chain))
 	    SET_HASHPRI(R_StringHash, HASHPRI(R_StringHash) + 1);
-	/* this is a destrictive modification */
+	/* this is a destructive modification */
 	chain = SET_CXTAIL(cval, chain);
 	SET_VECTOR_ELT(R_StringHash, hashcode, chain);
 
@@ -4316,7 +4316,7 @@ SEXP topenv(SEXP target, SEXP envir) {
 	if (env == target || env == R_GlobalEnv ||
 	    env == R_BaseEnv || env == R_BaseNamespace ||
 	    R_IsPackageEnv(env) || R_IsNamespaceEnv(env) ||
-	    existsVarInFrame(env, R_dot_packageName)) {
+	    R_existsVarInFrame(env, R_dot_packageName)) {
 	    return env;
 	} else {
 	    env = ENCLOS(env);
@@ -4345,7 +4345,7 @@ Rboolean attribute_hidden isUnmodifiedSpecSym(SEXP sym, SEXP env) {
 	return FALSE;
     for(;env != R_EmptyEnv; env = ENCLOS(env))
 	if (!NO_SPECIAL_SYMBOLS(env) && env != R_BaseEnv
-		&& env != R_BaseNamespace && existsVarInFrame(env, sym))
+		&& env != R_BaseNamespace && R_existsVarInFrame(env, sym))
 	    return FALSE;
     return TRUE;
 }

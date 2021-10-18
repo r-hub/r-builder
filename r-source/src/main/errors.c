@@ -425,7 +425,7 @@ static int wd(const char * buf)
 #else
 	nw = wcswidth(wc, 2147483647);
 #endif
-	return (nw < 1) ? nc : nw;
+	return (nw < 0) ? nc : nw;
     }
     return nc;
 }
@@ -1832,7 +1832,7 @@ static void vsignalError(SEXP call, const char *format, va_list ap)
 		/* if we are in the process of handling a C stack
 		   overflow, treat all calling handlers as failed */
 		if (R_OldCStackLimit)
-		    break;
+		    continue;
 		SEXP hooksym, hcall, qcall, qfun;
 		/* protect oldstack here, not outside loop, so handler
 		   stack gets unwound in case error is protect stack
