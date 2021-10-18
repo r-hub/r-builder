@@ -1,6 +1,6 @@
 Index: R4/nightly
 ===================================================================
---- R4/nightly	(revision 4799)
+--- R4/nightly	(revision 4297)
 +++ R4/nightly	(working copy)
 @@ -13,6 +13,8 @@
  # NOTE: packaging step re-signs all binaries and adds entitlements,
@@ -13,7 +13,7 @@ Index: R4/nightly
  
 Index: R4/packaging/build.sh
 ===================================================================
---- R4/packaging/build.sh	(revision 4799)
+--- R4/packaging/build.sh	(revision 4297)
 +++ R4/packaging/build.sh	(working copy)
 @@ -1,5 +1,7 @@
  #!/bin/bash
@@ -23,7 +23,7 @@ Index: R4/packaging/build.sh
  : ${BASE=/Volumes/Builds/R4}
  
  PKGROOT="$BASE/packaging"
-@@ -64,26 +66,26 @@
+@@ -43,27 +45,27 @@
  
  echo " - Removing previous builds ..."
  rm -rf "$DST/R-fw" "$DST/R-app"
@@ -35,17 +35,26 @@ Index: R4/packaging/build.sh
  tar fxz "$Rapp" -C "$DST/R-app"
  
 -. "$BASE/unlock-sign"
-+# . "$BASE/unlock-sign"
++#. "$BASE/unlock-sign"
++#
++#echo " - Signing R.app ..."
++#"$PKGROOT/R-sign-contents" "$DST/R-app" --force
++### after signing inside contents we also have to re-sign the entire app bundle
++#codesign --force -o runtime --timestamp --entitlements "$BASE/R.entitlements" -s "Developer ID Application" "$DST/R-app/R.app"
++#
++#echo " - Checking R.app signature ..."
++#if codesign -v "$DST/R-app/R.app"; then
++#    echo "   OK"
++#else
++#    echo "** ERROR: $DST/R-app/R.app does not pass codesign validation" >&1
++#    exit 1
++#fi
  
 -echo " - Signing R.app ..."
 -"$PKGROOT/R-sign-contents" "$DST/R-app" --force
 -## after signing inside contents we also have to re-sign the entire app bundle
 -codesign --force -o runtime --timestamp --entitlements "$BASE/R.entitlements" -s "Developer ID Application" "$DST/R-app/R.app"
-+# echo " - Signing R.app ..."
-+# "$PKGROOT/R-sign-contents" "$DST/R-app" --force
-+# ## after signing inside contents we also have to re-sign the entire app bundle
-+# codesign --force -o runtime --timestamp --entitlements "$BASE/R.entitlements" -s "Developer ID Application" "$DST/R-app/R.app"
- 
+-
 -echo " - Checking R.app signature ..."
 -if codesign -v "$DST/R-app/R.app"; then
 -    echo "   OK"
@@ -53,54 +62,64 @@ Index: R4/packaging/build.sh
 -    echo "** ERROR: $DST/R-app/R.app does not pass codesign validation" >&1
 -    exit 1
 -fi
-+# echo " - Checking R.app signature ..."
-+# if codesign -v "$DST/R-app/R.app"; then
-+#     echo "   OK"
-+# else
-+#     echo "** ERROR: $DST/R-app/R.app does not pass codesign validation" >&1
-+#     exit 1
-+# fi
- 
+-
  echo " - Extracting R framework ..."
  tar fxz "$FWTAR" -C "$DST/R-fw"
-@@ -90,8 +92,8 @@
  mv "$DST/R-fw/Library/Frameworks/R.framework" "$DST/R-fw/"
+@@ -70,7 +72,7 @@
  rm -rf "$DST/R-fw/Library"
  
--echo " - Signing R framework ..."
+ echo " - Signing R framework ..."
 -"$PKGROOT/R-sign-contents" "$DST/R-fw"
-+# echo " - Signing R framework ..."
 +# "$PKGROOT/R-sign-contents" "$DST/R-fw"
  
  GUIVER=`sed -n 's:.*<string>R .*GUI ::p' "$DST/R-app/R.app/Contents/Info.plist" | sed 's:[- ].*::' | head -n1`
  if [ -z "$GUIVER" ]; then
-@@ -101,9 +103,9 @@
- export GUIVER
- echo "   Detected GUI version $GUIVER"
+@@ -82,7 +84,8 @@
  
--echo " - Building R.app package ..."
--echo pkgbuild --sign 'Developer ID Installer' --identifier org.R-project${XARCH}.R.GUI.pkg --install-location /Applications --version "$GUIVER" --timestamp --root "$DST/R-app" --component-plist "$PKGROOT/R-app.plist" "$PKGROOT/R-app.pkg"
--pkgbuild --sign 'Developer ID Installer' --identifier org.R-project${XRACH}.R.GUI.pkg --install-location /Applications --version "$GUIVER" --timestamp --root "$DST/R-app" --component-plist "$PKGROOT/R-app.plist" "$PKGROOT/R-app.pkg"
-+# echo " - Building R.app package ..."
-+# echo pkgbuild --sign 'Developer ID Installer' --identifier org.R-project${XARCH}.R.GUI.pkg --install-location /Applications --version "$GUIVER" --timestamp --root "$DST/R-app" --component-plist "$PKGROOT/R-app.plist" "$PKGROOT/R-app.pkg"
-+# pkgbuild --sign 'Developer ID Installer' --identifier org.R-project${XRACH}.R.GUI.pkg --install-location /Applications --version "$GUIVER" --timestamp --root "$DST/R-app" --component-plist "$PKGROOT/R-app.plist" "$PKGROOT/R-app.pkg"
+ echo " - Building R.app package ..."
+ echo pkgbuild --sign 'Developer ID Installer' --identifier org.R-project.R.GUI.pkg --install-location /Applications --version "$GUIVER" --timestamp --root "$DST/R-app" --component-plist "$PKGROOT/R-app.plist" "$PKGROOT/R-app.pkg"
+-pkgbuild --sign 'Developer ID Installer' --identifier org.R-project.R.GUI.pkg --install-location /Applications --version "$GUIVER" --timestamp --root "$DST/R-app" --component-plist "$PKGROOT/R-app.plist" "$PKGROOT/R-app.pkg"
++echo pkgbuild --identifier org.R-project.R.GUI.pkg --install-location /Applications --version "$GUIVER" --timestamp --root "$DST/R-app" --component-plist "$PKGROOT/R-app.plist" "$PKGROOT/R-app.pkg"
++pkgbuild --identifier org.R-project.R.GUI.pkg --install-location /Applications --version "$GUIVER" --timestamp --root "$DST/R-app" --component-plist "$PKGROOT/R-app.plist" "$PKGROOT/R-app.pkg"
  
  RVER0=`sed -n 's:.*R_MAJOR::p' < "$DST/R-fw/R.framework/Headers/Rversion.h" | sed 's:[^0-9.]*::g'`
  RVER1=`sed -n 's:.*R_MINOR::p' < "$DST/R-fw/R.framework/Headers/Rversion.h" | sed 's:[^0-9.]*::g'`
-@@ -120,12 +122,12 @@
-     exit 1
+@@ -99,11 +102,11 @@
  fi
  
--echo " - Building R framework package for $VERFULL ..."
--echo pkgbuild --sign 'Developer ID Installer' --identifier org.R-project${XARCH}.R.fw.pkg --install-location /Library/Frameworks --version "$VER" --scripts "$PKGROOT/scripts-R-fw" --timestamp --root "$DST/R-fw" --component-plist "$PKGROOT/R-fw.plist" "$PKGROOT/R-fw.pkg"
--pkgbuild --sign 'Developer ID Installer' --identifier org.R-project${XARCH}.R.fw.pkg --install-location /Library/Frameworks --version "$VER" --scripts "$PKGROOT/scripts-R-fw" --timestamp --root "$DST/R-fw" --component-plist "$PKGROOT/R-fw.plist" "$PKGROOT/R-fw.pkg"
-+# echo " - Building R framework package for $VERFULL ..."
-+# echo pkgbuild --sign 'Developer ID Installer' --identifier org.R-project${XARCH}.R.fw.pkg --install-location /Library/Frameworks --version "$VER" --scripts "$PKGROOT/scripts-R-fw" --timestamp --root "$DST/R-fw" --component-plist "$PKGROOT/R-fw.plist" "$PKGROOT/R-fw.pkg"
-+# pkgbuild --sign 'Developer ID Installer' --identifier org.R-project${XARCH}.R.fw.pkg --install-location /Library/Frameworks --version "$VER" --scripts "$PKGROOT/scripts-R-fw" --timestamp --root "$DST/R-fw" --component-plist "$PKGROOT/R-fw.plist" "$PKGROOT/R-fw.pkg"
+ echo " - Building R framework package for $VERFULL ..."
+-echo pkgbuild --sign 'Developer ID Installer' --identifier org.R-project.R.fw.pkg --install-location /Library/Frameworks --version "$VER" --scripts "$PKGROOT/scripts-R-fw" --timestamp --root "$DST/R-fw" --component-plist "$PKGROOT/R-fw.plist" "$PKGROOT/R-fw.pkg"
+-pkgbuild --sign 'Developer ID Installer' --identifier org.R-project.R.fw.pkg --install-location /Library/Frameworks --version "$VER" --scripts "$PKGROOT/scripts-R-fw" --timestamp --root "$DST/R-fw" --component-plist "$PKGROOT/R-fw.plist" "$PKGROOT/R-fw.pkg"
++echo pkgbuild --identifier org.R-project.R.fw.pkg --install-location /Library/Frameworks --version "$VER" --scripts "$PKGROOT/scripts-R-fw" --timestamp --root "$DST/R-fw" --component-plist "$PKGROOT/R-fw.plist" "$PKGROOT/R-fw.pkg"
++pkgbuild --identifier org.R-project.R.fw.pkg --install-location /Library/Frameworks --version "$VER" --scripts "$PKGROOT/scripts-R-fw" --timestamp --root "$DST/R-fw" --component-plist "$PKGROOT/R-fw.plist" "$PKGROOT/R-fw.pkg"
  
  echo " - Creating distribution description ..."
  "$PKGROOT/mkres" "$PKGROOT"
  
  echo " - Building final bundle ..."
--productbuild --timestamp --product "$PKGROOT/req.plist" --resources "$PKGROOT/res" --sign 'Developer ID Installer' --distribution "$PKGROOT/dist.plist" --package-path "$PKGROOT" "$PKGROOT/$NAME.pkg" && cp -p "$PKGROOT/$NAME.pkg" "$BASE/deploy/$osname/$NAME/" && echo "R $VERFULL, GUI $GUIVER in $NAME.pkg" > "$BASE/deploy/$osname/$NAME/$NAME.pkg.SUCCESS" && echo "SUCCESS, a copy is in $BASE/deploy/$osname/$NAME/$NAME.pkg"
-+productbuild --timestamp --product "$PKGROOT/req.plist" --resources "$PKGROOT/res" --distribution "$PKGROOT/dist.plist" --package-path "$PKGROOT" "$PKGROOT/$NAME.pkg" && cp -p "$PKGROOT/$NAME.pkg" "$BASE/deploy/$osname/$NAME/" && echo "R $VERFULL, GUI $GUIVER in $NAME.pkg" > "$BASE/deploy/$osname/$NAME/$NAME.pkg.SUCCESS" && echo "SUCCESS, a copy is in $BASE/deploy/$osname/$NAME/$NAME.pkg"
+-productbuild --timestamp --resources "$PKGROOT/res" --sign 'Developer ID Installer' --distribution "$PKGROOT/dist.plist" --package-path "$PKGROOT" "$PKGROOT/$NAME.pkg" && cp -p "$PKGROOT/$NAME.pkg" "$BASE/deploy/$osname/$NAME/" && echo "R $VERFULL, GUI $GUIVER in $NAME.pkg" > "$BASE/deploy/$osname/$NAME/$NAME.pkg.SUCCESS" && echo "SUCCESS, a copy is in $BASE/deploy/$osname/$NAME/$NAME.pkg"
++productbuild --timestamp --resources "$PKGROOT/res" --distribution "$PKGROOT/dist.plist" --package-path "$PKGROOT" "$PKGROOT/$NAME.pkg" && cp -p "$PKGROOT/$NAME.pkg" "$BASE/deploy/$osname/$NAME/" && echo "R $VERFULL, GUI $GUIVER in $NAME.pkg" > "$BASE/deploy/$osname/$NAME/$NAME.pkg.SUCCESS" && echo "SUCCESS, a copy is in $BASE/deploy/$osname/$NAME/$NAME.pkg"
+
+Index: R4/src/consh.c
+===================================================================
+--- R4/src/consh.c	(revision 4304)
++++ R4/src/consh.c	(working copy)
+@@ -4,6 +4,7 @@
+ #include <unistd.h>
+ #include <stdio.h>
+ #include <string.h>
++#include <stdlib.h>
+ 
+ FILE *lf;
+ 
+Index: R4/src/fixup.c
+===================================================================
+--- R4/src/fixup.c	(revision 4304)
++++ R4/src/fixup.c	(working copy)
+@@ -1,4 +1,5 @@
+ #include <unistd.h>
++#include <stdlib.h>
+ 
+ int main(int argc, char **argv) {
+   setuid(0);
