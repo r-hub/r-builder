@@ -11,6 +11,15 @@ Index: R4/nightly
  : ${BASE=/Volumes/Builds/R4}
  : ${RDIRS=`cat $BASE/builds`}
  
+@@ -45,7 +47,7 @@
+     JOBID=nightly-$$-`date +%s`
+     export JOBID
+ fi
+-LOCKJOB=`cat "$BASE/LOCK" 2>/dev/null`
++LOCKJOB=`cat "$BASE/LOCK" 2>/dev/null || true`
+ if [ -n "$LOCKJOB" -a "$LOCKJOB" != "$JOBID" ]; then
+     echo "ERROR: build locked by $LOCKJOB (I am $JOBID)" >&2
+     exit 1
 Index: R4/packaging/build.sh
 ===================================================================
 --- R4/packaging/build.sh	(revision 4799)
