@@ -25,6 +25,7 @@ function create_build_scripts() {
         patch -p0 < ../simon.diff
         cd R4
         if [[ ! -e R-devel ]]; then cp -a ../../r-source R-devel; fi
+        if [[ ! -e R-4-2-branch ]]; then cp -a ../../r-patched R-4-2-branch; fi
         if [[ ! -e Mac-GUI ]]; then cp -a ../../mac-gui Mac-GUI; fi
         mkdir -p R-devel/.svn/tmp
         mkdir -p Mac-GUI/.svn/tmp
@@ -37,7 +38,8 @@ function build() {
     (
         cd _build/R4
         export BASE=`pwd`
-        export RDIRS=R-devel
+        export RDIRS="R-4-2-branch"
+#        export RDIRS="R-4-2-branch R-devel"
         make
         sudo -E ./nightly
     )

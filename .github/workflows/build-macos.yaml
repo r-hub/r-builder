@@ -47,16 +47,20 @@ jobs:
         cat _build/R4/high-sierra-x86_64/R-devel.build || true
         echo "::endgroup::"
 
-    - name: Upload build tar.gz
-      uses: actions/upload-artifact@v2
+    - name: Upload R-next
+      uses: actions/upload-artifact@v3
       with:
-        name: R-devel.pkg
-        path: _build/R4/deploy/high-sierra/R-devel/x86_64/R-devel.tar.gz
+        name: R-next.pkg
+        path: |
+          _build/R4/deploy/high-sierra/R-4-2-branch/x86_64/R-*.tar.gz
+          _build/R4/deploy/high-sierra/R-4-2-branch/R-devel.pkg
         if-no-files-found: error
 
-    - name: Upload installer
-      uses: actions/upload-artifact@v2
+    - name: Upload R-devel
+      uses: actions/upload-artifact@v3
       with:
         name: R-devel.pkg
-        path: _build/R4/deploy/high-sierra/R-devel/R-devel.pkg
+        path: |
+          _build/R4/deploy/high-sierra/R-devel/x86_64/R-*.tar.gz
+          _build/R4/deploy/high-sierra/R-devel/R-devel.pkg
         if-no-files-found: error
